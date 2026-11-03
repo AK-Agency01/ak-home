@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- akagency.app/akhome colours: near-black #050104, violet accent (never pink) -->
+    <style name="Installer" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:statusBarColor">#050104</item>
+        <item name="android:navigationBarColor">#050104</item>
+        <item name="android:colorAccent">#8B5CF6</item>
+        <item name="android:textColorHighlight">#668B5CF6</item>
+    </style>
+</resources>

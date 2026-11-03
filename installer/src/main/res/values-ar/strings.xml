@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مُثبّت AK Home</string>
+    <string name="tagline">نصّب AK Home على شاشتك بضغطة وحدة — التلفون والشاشة على نفس الواي فاي.</string>
+    <string name="eyebrow_start">ثبّته من هاتفك</string>
+    <string name="chip_wifi">واي فاي فقط</string>
+    <string name="chip_nopc">بلا حاسوب</string>
+    <string name="chip_free">مجاني</string>
+    <string name="find_tv">نصّب على شاشتي</string>
+    <string name="restore">رجّع الأصلي</string>
+    <string name="guide_btn">أول مرة؟ فعّل وضع المطوّر بالشاشة</string>
+
+    <string name="searching">ندوّر على الشاشات بالواي فاي مالتك…</string>
+    <string name="no_wifi">اربط التلفون على نفس واي فاي الشاشة.</string>
+    <string name="none_yet">بعد ما لكينا شي. وضع المطوّر مفعّل؟ شوف الشرح جوّه.</string>
+    <string name="manual">أو اكتب عنوان الشاشة</string>
+    <string name="manual_hint">مثلاً 192.168.1.20</string>
+    <string name="go">اتصل</string>
+    <string name="wireless">تصحيح لاسلكي (أندرويد 11 وأحدث)</string>
+    <string name="network">تصحيح عبر الشبكة</string>
+
+    <string name="pair_title">اقترن ويّه الشاشة</string>
+    <string name="pair_steps">بالشاشة: الإعدادات ← خيارات المطوّر ← التصحيح اللاسلكي ← إقران جهاز برمز. اكتب الرمز (6 أرقام) والمنفذ اللي يطلعون هناك.</string>
+    <string name="pair_code">رمز الإقران</string>
+    <string name="pair_port">المنفذ</string>
+    <string name="pair_btn">اقترن</string>
+
+    <string name="connecting">نتصل بـ %1$s…</string>
+    <string name="accept_on_tv">بالشاشة اختار «السماح دائماً من هذا الكمبيوتر» واضغط موافق.</string>
+    <string name="connect_failed">ما كدرنا نتصل: %1$s</string>
+
+    <string name="tvbox">TV Box</string>
+    <string name="tvbox_sub">للبوكسات والستكات (بدون مداخل HDMI).</string>
+    <string name="screens">Screens</string>
+    <string name="screens_sub">للشاشات: بيها زر Inputs (HDMI، AV).</string>
+
+    <string name="step_copy">ندزّ AK Home للشاشة</string>
+    <string name="step_home">نخليه الواجهة الرئيسية</string>
+    <string name="step_check">نتأكد</string>
+    <string name="done_title">AK Home صار واجهة شاشتك ✓</string>
+    <string name="done_sub">اضغط Home بالريموت بأي وقت. حتى ترجع، افتح هذا التطبيق واختار «رجّع الأصلي».</string>
+    <string name="again">رجوع للبداية</string>
+
+    <string name="restore_title">رجّع الأصلي على %1$s</string>
+    <string name="restore_list">راح ترجع تشتغل: %1$s</string>
+    <string name="restore_nothing">AK Home ما طفّى شي على هاي الشاشة.</string>
+    <string name="remove_too">احذف AK Home هم</string>
+    <string name="restore_btn">رجّع</string>
+    <string name="restored">رجعت واجهة الشاشة الأصلية ✓</string>
+
+    <string name="guide_title">فعّل وضع المطوّر (مرة وحدة بس)</string>
+    <string name="guide_1">بالشاشة افتح الإعدادات ⚙️، واختار «تفضيلات الأجهزة».</string>
+    <string name="guide_2">افتح «لمحة».</string>
+    <string name="guide_3">انزل لـ «الإصدار» (رقم البناء) واضغط OK سبع مرات، لحد ما يطلع «أصبحت الآن مطوّراً».</string>
+    <string name="guide_4">اضغط رجوع مرة وحدة، وافتح «خيارات مطور البرامج».</string>
+    <string name="guide_5">شغّل «تصحيح أخطاء USB» واضغط موافق.</string>
+    <string name="back">رجوع</string>
+    <string name="install_btn">نصّب %1$s</string>
+    <string name="detected_kind_tv">النوع: تلفزيون — %1$s</string>
+    <string name="detected_kind_box">النوع: TV بوكس — %1$s</string>
+    <string name="plan_title">شنو راح يصير</string>
+    <string name="plan_keep">يبقى مثل ما هو: كل تطبيقاتك (%1$d) وبياناتها.</string>
+    <string name="plan_off">ينطفي بس ما ينحذف: %1$s — لأنه ماسك زر Home. «رجّع الأصلي» يشغّله مرة ثانية.</string>
+    <string name="plan_none_off">ماكو واجهة تحتاج تنطفي.</string>
+    <string name="plan_nothing_else">ولا شي ثاني بالشاشة ينحذف أو يتغير.</string>
+    <string name="fix_space">الطبيب: المساحة ما تكفي بالشاشة — نظّفت الكاش</string>
+    <string name="fix_resend">الطبيب: الملف وصل خربان — دزّيته مرة ثانية</string>
+    <string name="fix_replace">الطبيب: جان أكو AK Home قديم بتوقيع ثاني — بدّلته</string>
+    <string name="fix_downgrade">الطبيب: جان أكو AK Home أحدث — نصّبت هذا فوكه</string>
+    <string name="fix_other_home">الطبيب: بعد أكو واجهة ثانية شغالة (%1$s) — طفّيتها هم</string>
+    <string name="fix_start">الطبيب: AK Home ما اشتغل — شغّلته مرة ثانية</string>
+    <string name="fix_reconnect">الطبيب: انقطع الاتصال — رجعت اتصلت</string>
+    <string name="problem_restricted">الشاشة تمنع التنصيب من الكمبيوتر. بخيارات المطوّر شغّل «التثبيت عبر USB» (شاومي: هم «تصحيح USB (إعدادات الأمان)»)، وبعدين جرّب مرة ثانية.</string>
+    <string name="problem_refused">الشاشة رفضت التنصيب: %1$s</string>
+    <string name="problem_not_home">زر Home بعده يفتح الواجهة القديمة. اضغط Home بالريموت واختار AK Home ويّه «دائماً».</string>
+    <string name="problem_crash">AK Home ما يشتغل على هاي الشاشة. دزّلنا موديل الشاشة: %1$s</string>
+    <string name="problem_refused_conn">الشاشة ما ردّت على المنفذ 5555. شغّل «تصحيح USB» (و«التصحيح عبر الشبكة» إذا موجود) بخيارات المطوّر — شوف الشرح.</string>
+    <string name="problem_timeout">الشاشة ما ردّت بالوقت. هي على نفس الواي فاي؟ وضغطت موافق على «السماح بالتصحيح؟»</string>
+    <string name="problem_auth">الشاشة رفضت. جرّب مرة ثانية واختار «السماح دائماً من هذا الكمبيوتر».</string>
+    <string name="problem_net">التلفون ما يوصل للشاشة. خلّي الثنين على نفس الواي فاي (مو شبكة الضيوف) وجرّب مرة ثانية.</string>
+    <string name="q_kind">أي جهاز؟</string>
+    <string name="kind_box">TV بوكس</string>
+    <string name="kind_tv">شاشة (تلفزيون)</string>
+    <string name="detected_hint">✓ = اللي اكتشفناه؛ اضغط حتى تغيّر</string>
+    <string name="other_language">🌐  English</string>
+<string name="why_cec_tv">هو تلفزيون (HDMI-CEC)</string>
+    <string name="why_cec_box">هو بوكس تشغيل (HDMI-CEC)</string>
+    <string name="why_hdmi">بيه مداخل HDMI</string>
+    <string name="why_maker">شركة تلفزيونات (%1$s)</string>
+    <string name="why_no_hdmi">ما بيه مداخل HDMI</string>
+<string name="kind_unsure">ما كدرنا نعرف: هل هو شاشة (تلفزيون) لو TV بوكس؟ اختار وحدة جوّه.</string>
+    <string name="pick_kind_first">اختار نوع الجهاز أول ↑</string>
+<string name="search_again">دوّر مرة ثانية</string>
+    <plurals name="found_n">
+        <item quantity="zero">ما لكينا شي</item>
+        <item quantity="one">لكينا شاشة وحدة — اضغط عليها</item>
+        <item quantity="two">لكينا شاشتين — اضغط على شاشتك</item>
+        <item quantity="few">لكينا %d شاشات — اضغط على شاشتك</item>
+        <item quantity="many">لكينا %d شاشة — اضغط على شاشتك</item>
+        <item quantity="other">لكينا %d شاشة — اضغط على شاشتك</item>
+    </plurals>
+    <string name="guide_6">بعض البوكسات بيها «تصحيح عبر الشبكة» أو «ADB over network»: شغّله هم. أندرويد 11 وأحدث: شغّل «التصحيح اللاسلكي». وبعدين خلّي التلفون على نفس الواي فاي واضغط «نصّب على شاشتي».</string>
+</resources>

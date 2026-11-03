@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AK Home Installer</string>
+    <!-- the name under the icon in the phone's app list, the same in every language (user, 2026-10-31) -->
+    <string name="launcher_name" translatable="false">AK Home</string>
+    <string name="tagline">Put AK Home on your TV in one tap — phone and TV on the same Wi-Fi.</string>
+    <string name="eyebrow_start">Install from your phone</string>
+    <string name="chip_wifi">Wi-Fi only</string>
+    <string name="chip_nopc">No computer</string>
+    <string name="chip_free">Free</string>
+    <string name="find_tv">Install on my TV</string>
+    <string name="restore">Back to the original</string>
+    <string name="guide_btn">First time? Turn on debugging on the TV</string>
+
+    <string name="searching">Looking for TVs on your Wi-Fi…</string>
+    <string name="no_wifi">Connect the phone to the same Wi-Fi as the TV.</string>
+    <string name="none_yet">Nothing yet. Is debugging on? See the guide below.</string>
+    <string name="manual">Or type the TV\'s address</string>
+    <string name="manual_hint">e.g. 192.168.1.20</string>
+    <string name="go">Connect</string>
+    <string name="wireless">Wireless debugging (Android 11+)</string>
+    <string name="network">Network debugging</string>
+
+    <string name="pair_title">Pair with the TV</string>
+    <string name="pair_steps">On the TV: Settings → Developer options → Wireless debugging → Pair device with pairing code. Type the 6-digit code and the port shown there.</string>
+    <string name="pair_code">Pairing code</string>
+    <string name="pair_port">Port</string>
+    <string name="pair_btn">Pair</string>
+
+    <string name="connecting">Connecting to %1$s…</string>
+    <string name="accept_on_tv">On the TV, choose “Always allow from this computer” and OK.</string>
+    <string name="connect_failed">Could not connect: %1$s</string>
+
+    <string name="tvbox">TV Box</string>
+    <string name="tvbox_sub">For boxes and sticks (no HDMI inputs).</string>
+    <string name="screens">Screens</string>
+    <string name="screens_sub">For TV sets: adds an Inputs button (HDMI, AV).</string>
+
+    <string name="step_copy">Sending AK Home to the TV</string>
+    <string name="step_home">Making it the home screen</string>
+    <string name="step_check">Checking</string>
+    <string name="done_title">AK Home is your TV\'s home screen ✓</string>
+    <string name="done_sub">Press Home on the remote any time. To undo, open this app and choose “Back to the original”.</string>
+    <string name="again">Back to start</string>
+
+    <string name="restore_title">Back to the original on %1$s</string>
+    <string name="restore_list">Switched on again: %1$s</string>
+    <string name="restore_nothing">AK Home did not switch anything off on this TV.</string>
+    <string name="remove_too">Also remove AK Home</string>
+    <string name="restore_btn">Restore</string>
+    <string name="restored">The TV\'s own home screen is back ✓</string>
+
+    <string name="guide_title">Turn on debugging (once)</string>
+    <string name="guide_1">On the TV open Settings ⚙️, then choose «Device Preferences».</string>
+    <string name="guide_2">Open «About».</string>
+    <string name="guide_3">Go down to «Build» and press OK 7 times, until it says “You are now a developer”.</string>
+    <string name="guide_4">Press Back once, then open «Developer options».</string>
+    <string name="guide_5">Turn on «USB debugging» and press OK.</string>
+    <string name="back">Back</string>
+    <string name="install_btn">Install %1$s</string>
+    <string name="detected_kind_tv">Type: TV set — %1$s</string>
+    <string name="detected_kind_box">Type: TV box — %1$s</string>
+    <string name="plan_title">What will happen</string>
+    <string name="plan_keep">Stays as it is: all your apps (%1$d) and their data.</string>
+    <string name="plan_off">Switched off, not deleted: %1$s — it holds the Home button. “Back to the original” turns it on again.</string>
+    <string name="plan_none_off">No home screen needs switching off.</string>
+    <string name="plan_nothing_else">Nothing else on the TV is deleted or changed.</string>
+    <string name="fix_space">Doctor: not enough space on the TV — cleared caches</string>
+    <string name="fix_resend">Doctor: the copy was damaged — sent it again</string>
+    <string name="fix_replace">Doctor: an older AK Home signed differently was on the TV — replaced it</string>
+    <string name="fix_downgrade">Doctor: a newer AK Home was on the TV — installed this one over it</string>
+    <string name="fix_other_home">Doctor: another home screen was still active (%1$s) — switched it off too</string>
+    <string name="fix_start">Doctor: AK Home did not start — started it again</string>
+    <string name="fix_reconnect">Doctor: the connection dropped — connected again</string>
+    <string name="problem_restricted">The TV blocks installs from a computer. In Developer options turn on “Install via USB” (Xiaomi: also “USB debugging (Security settings)”), then try again.</string>
+    <string name="problem_refused">The TV refused the install: %1$s</string>
+    <string name="problem_not_home">The Home button still opens the old home screen. Press Home on the remote and choose AK Home with “Always”.</string>
+    <string name="problem_crash">AK Home does not start on this TV. Send us the TV model: %1$s</string>
+    <string name="problem_refused_conn">The TV did not answer on port 5555. Turn on “USB debugging” (and “Network debugging” if it has it) in Developer options — see the guide.</string>
+    <string name="problem_timeout">The TV did not answer in time. Is it on the same Wi-Fi, and did you press OK on “Allow debugging?”</string>
+    <string name="problem_auth">The TV said no. Try again and choose “Always allow from this computer”.</string>
+    <string name="problem_net">The phone cannot reach the TV. Put both on the same Wi-Fi (not a guest network) and try again.</string>
+    <string name="q_kind">Which device?</string>
+    <string name="kind_box">TV Box</string>
+    <string name="kind_tv">Screens (TV set)</string>
+    <string name="detected_hint">✓ = what we detected; tap to change</string>
+    <string name="other_language">🌐  العربية</string>
+<string name="why_cec_tv">it is a TV set (HDMI-CEC)</string>
+    <string name="why_cec_box">it is a playback box (HDMI-CEC)</string>
+    <string name="why_hdmi">it has HDMI inputs</string>
+    <string name="why_maker">TV maker (%1$s)</string>
+    <string name="why_no_hdmi">no HDMI inputs</string>
+<string name="kind_unsure">We could not tell: is it a TV set (screen) or a TV box? Choose one below.</string>
+    <string name="pick_kind_first">Choose the device first ↑</string>
+<string name="search_again">Search again</string>
+    <plurals name="found_n">
+        <item quantity="one">Found %d screen — tap it</item>
+        <item quantity="other">Found %d screens — tap yours</item>
+    </plurals>
+    <string name="guide_6">Some boxes also have «Network debugging» or «ADB over network»: turn it on. Android 11 and newer: turn on «Wireless debugging». Then put the phone on the same Wi-Fi and tap «Install on my TV».</string>
+</resources>

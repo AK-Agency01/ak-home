@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown for the first frames, before the app-colour tint takes over. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><color android:color="#FF080106" /></item>
+    <item>
+        <shape>
+            <gradient android:type="radial" android:centerX="0.36" android:centerY="0.38"
+                android:gradientRadius="110%p" android:startColor="#FF56042C" android:endColor="#0056042C" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <gradient android:angle="0" android:startColor="#0056042C" android:centerColor="#2256042C"
+                android:endColor="#CC0C0006" />
+        </shape>
+    </item>
+</layer-list>

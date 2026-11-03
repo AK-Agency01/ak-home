@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Arabic (Modern Standard) — used when the box language is Arabic (user, 2026-10-30). -->
+<resources>
+    <string name="wifi">واي فاي</string>
+    <string name="ethernet">إيثرنت</string>
+    <string name="offline">غير متصل</string>
+    <string name="settings">الإعدادات</string>
+    <string name="inputs">المداخل</string>
+    <string name="no_inputs">لا توجد مداخل تلفاز في هذا الجهاز</string>
+    <string name="input_connected">متصل</string>
+    <string name="all_apps">كل التطبيقات</string>
+    <string name="am">ص</string>
+    <string name="pm">م</string>
+
+    <string name="pick_fav">اختر تطبيقاً مفضلاً</string>
+    <string name="move_app">نقل التطبيق ↔</string>
+    <string name="pin_first">ضعه في البداية</string>
+    <string name="unpin_first">أزله من البداية</string>
+    <string name="hide">إخفاء من الرئيسية</string>
+    <string name="show">إظهار في الرئيسية</string>
+    <string name="app_info">معلومات التطبيق (تعطيل / إزالة)</string>
+    <string name="uninstall">إزالة التطبيق</string>
+    <string name="move_hint">%1$s   ·   حرّكه بالأسهم ثم اضغط OK</string>
+    <string name="saved_place">حُفظ المكان ✓</string>
+
+    <string name="boost_start">⚡  جارٍ تحرير الذاكرة…</string>
+    <string name="boost_done">⚡  تحرّر %1$d ميغابايت  ·  المتاح %2$d ميغابايت</string>
+
+    <string name="update_title">تحديث جديد لـ AK Home</string>
+    <string name="update_body">الإصدار %1$s جاهز  ·  مفضّلاتك وترتيبك يبقيان كما هما</string>
+    <string name="update_now">ثبّت الآن</string>
+    <string name="update_later">لاحقاً</string>
+    <string name="update_installing">جارٍ التحديث… يعود AK Home بعد لحظات</string>
+    <string name="update_failed">تعذّر التحديث، سنحاول لاحقاً</string>
+
+    <string name="hero_title">الأفلام والمسلسلات الرائجة</string>
+    <string name="hero_offline">اتصل بالإنترنت لترى ما يشاهده العالم</string>
+    <string name="lite_on">الوضع الخفيف مفعّل</string>
+    <string name="lite_off">الوضع الخفيف متوقف</string>
+    <string name="lite_auto">الوضع الخفيف: تلقائي</string>
+
+    <string-array name="days">
+        <item>الأحد</item><item>الاثنين</item><item>الثلاثاء</item><item>الأربعاء</item>
+        <item>الخميس</item><item>الجمعة</item><item>السبت</item>
+    </string-array>
+    <string-array name="months">
+        <item>يناير</item><item>فبراير</item><item>مارس</item><item>أبريل</item><item>مايو</item><item>يونيو</item>
+        <item>يوليو</item><item>أغسطس</item><item>سبتمبر</item><item>أكتوبر</item><item>نوفمبر</item><item>ديسمبر</item>
+    </string-array>
+</resources>

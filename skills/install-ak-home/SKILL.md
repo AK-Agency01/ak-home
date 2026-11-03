@@ -53,12 +53,29 @@ Let AK Home install its own updates later: `adb shell appops set com.akhome.laun
 
 ## 5. Make it the home screen
 
+**Xiaomi / Mi TV / Redmi TV — read this first.** These TVs need their own home screen (PatchWall,
+`com.mitv.tvhome` / `com.mitv.tvhome.atv`) to start and to take the remote. Switching it off looks fine until the next
+power-on, then the screen stays black and the remote is dead. So on a TV where
+`adb shell getprop ro.product.manufacturer` / `ro.product.brand` says Xiaomi, or `adb shell pm list packages` shows any
+`com.mitv.` or `com.xiaomi.` package:
+
+- **Switch nothing off.** Skip steps 1–4 and run only step 5 (pick AK Home) and step 7.
+- If an earlier install switched launchers off (`/data/local/tmp/akhome-restore.txt` exists), switch them all back on
+  first (`pm enable` each line), then delete that file.
+- If Xiaomi's home still answers the Home key, leave it: tell the user AK Home opens from the apps. Never "fix" this by
+  switching Xiaomi's home off.
+
+On every TV, **never** switch off any `com.mitv.*` or `com.xiaomi.*` package.
+
+Everywhere else:
+
 1. List the launchers that answer the Home key (Android 7+):
    `adb shell cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME`
 2. Keep only **real launchers**: system apps (`adb shell pm list packages -s`) or known ones such as
    `com.google.android.tvlauncher`, `com.google.android.apps.tv.launcherx`, `com.google.android.leanbacklauncher`,
    `com.droidlogic.launcher.provider`, `com.android.launcher3`. Never switch off `com.akhome.launcher`, `android`,
-   or anything whose name contains settings, setup, provision, fallback or wizard. Never touch ordinary apps the user
+   any `com.mitv.*` / `com.xiaomi.*` package, or anything whose name contains settings, setup, provision, fallback or
+   wizard. Never touch ordinary apps the user
    installed, even if they declare a home screen.
 3. Write them down on the TV first, one per line (this is what "put it back" reads):
    `adb shell "printf '%s\n' <pkg1> <pkg2> > /data/local/tmp/akhome-restore.txt"`

@@ -60,8 +60,13 @@ adb install -r AK-Home-TVBox.apk        # or AK-Home-Screens.apk for a TV set
 adb shell cmd role add-role-holder android.app.role.HOME com.akhome.launcher 0
 ```
 
-On Google TV / Android TV the stock launcher also needs `pm disable-user --user 0 <launcher package>` — the skill and
-the phone app do this safely and remember it.
+On Google TV / Android TV the stock launcher also needs `pm disable-user --user 0 <launcher package>` — the skill
+does this safely and remembers it.
+
+> [!WARNING]
+> **Xiaomi / Mi TV / Redmi TV:** never switch off the TV's own home (PatchWall, `com.mitv.*`). The TV needs it to
+> start: switched off, the screen goes black with a dead remote after the next power-on. The agent skill handles this.
+> The v1.1 phone installer does **not** yet — don't use it on Xiaomi TVs until the next release.
 
 ## Build
 
@@ -103,6 +108,9 @@ need their own name and logo.
 
 - **من التلفون:** نزّل **AK-Home-Installer.apk** من [Releases](https://github.com/AK-Agency01/ak-home/releases/latest)،
   شغّل خيار المطوّرين و USB debugging بالتلفزيون، والتطبيق يلكَه التلفزيون عالواي فاي وينصّب كلشي وحده.
+- **⚠️ شاشات شاومي:** لا تطفّي واجهة الشاشة الأصلية (PatchWall) أبداً، لأن الشاشة تحتاجها حتى تشتغل، وإذا انطفت
+  تطلع الشاشة سودة والريموت ما يشتغل بعد أول إطفاء وتشغيل. الـ Skill تتعامل وياها صح، بس منصّب التلفون 1.1 بعده لا،
+  فلا تستخدمه على شاشات شاومي لحد الإصدار الجاي.
 - **بالذكاء الاصطناعي:** حط مجلد `skills/install-ak-home` بـ `~/.claude/skills/` وكَول لـ Claude Code:
   «نصّبلي AK Home على تلفزيوني».
 

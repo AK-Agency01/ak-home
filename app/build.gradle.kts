@@ -16,8 +16,8 @@ android {
         // 1.0 = the launch version (user, 2026-10-30: everything renamed 1.0). The code keeps rising (5.1.0 was 2),
         // or boxes refuse it — and the self-update compares it. `-PvcTest=N` only for update tests on a box.
         // 1.1 (code 5, 2026-10-31) = the 1.0 memory-leak fix + the new card
-        versionCode = project.findProperty("vcTest")?.toString()?.toInt() ?: 5
-        versionName = "1.1"
+        versionCode = project.findProperty("vcTest")?.toString()?.toInt() ?: 6
+        versionName = "1.2"
         // where the self-update looks (Updater). `-PupdateUrl=http://127.0.0.1:8099/update.json` for tests only
         // (an emulator + `adb reverse`); plain http is then allowed, never in a normal build.
         val upd = project.findProperty("updateUrl")?.toString()

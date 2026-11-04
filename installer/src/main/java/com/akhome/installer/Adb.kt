@@ -47,8 +47,16 @@ object AdbKeys {
     }
 }
 
+/** What Tv needs from a connection: shell commands and a file copy (a test can run the same commands locally). */
+interface TvShell {
+    /** Runs a command on the TV and returns everything it printed (stdout + stderr), trimmed. */
+    fun sh(cmd: String): String
+    fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit)
+    fun prop(name: String): String = sh("getprop $name")
+}
+
 /** One ADB connection to one TV. Not thread-safe: use it from one worker thread. */
-class AdbClient : AbsAdbConnectionManager() {
+class AdbClient : AbsAdbConnectionManager(), TvShell {
     init {
         api = Build.VERSION_CODES.R          // understands the TLS upgrade of Android 11+ TVs; old TVs never ask for it
         setTimeout(90, TimeUnit.SECONDS)     // long enough for someone to accept "Allow debugging?" on the TV
@@ -58,8 +66,7 @@ class AdbClient : AbsAdbConnectionManager() {
     override fun getCertificate(): Certificate = AdbKeys.cert
     override fun getDeviceName(): String = "AK Home Installer"
 
-    /** Runs a command on the TV and returns everything it printed (stdout + stderr), trimmed. */
-    fun sh(cmd: String): String = openStream("shell:($cmd) 2>&1; echo $END").use { s ->
+    override fun sh(cmd: String): String = openStream("shell:($cmd) 2>&1; echo $END").use { s ->
         // libadb 3.1.1 can wait forever after the TV closes a stream whose last data was already queued,
         // so the command prints an end marker and we stop reading at it instead of waiting for the close.
         val input = s.openInputStream()
@@ -81,7 +88,7 @@ class AdbClient : AbsAdbConnectionManager() {
      * Copies a file to the TV byte for byte. `exec:` (Android 5+) has no terminal in between, so binary data
      * arrives intact, unlike `shell:` on old TVs.
      */
-    fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit) {
+    override fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit) {
         openStream("exec:cat > $path").use { s ->
             val out = s.openOutputStream()
             val buf = ByteArray(64 * 1024)
@@ -101,6 +108,4 @@ class AdbClient : AbsAdbConnectionManager() {
             Thread.sleep(200)
         }
     }
-
-    fun prop(name: String): String = sh("getprop $name")
 }

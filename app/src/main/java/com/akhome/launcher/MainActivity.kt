@@ -1101,7 +1101,11 @@ class MainActivity : Activity() {
         val before = avail()
         Toast.makeText(this, R.string.boost_start, Toast.LENGTH_SHORT).show()
         Thread {
-            for (ai in packageManager.getInstalledApplications(0)) if (ai.packageName != packageName) am.killBackgroundProcesses(ai.packageName)
+            // installed apps only: the TV's own parts (remote, inputs, picture — Xiaomi keeps them in background apps)
+            // are never touched
+            val sys = android.content.pm.ApplicationInfo.FLAG_SYSTEM or android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+            for (ai in packageManager.getInstalledApplications(0))
+                if (ai.packageName != packageName && ai.flags and sys == 0) am.killBackgroundProcesses(ai.packageName)
             System.gc()
             main.postDelayed({
                 val after = avail()

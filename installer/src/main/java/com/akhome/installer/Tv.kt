@@ -21,6 +21,11 @@ class TvInfo(
     val kind: Kind, val kindWhy: String, val userApps: Int,
     /** false when nothing told us TV set or box for sure: then the installer asks the user. */
     val kindSure: Boolean = true,
+    /**
+     * TVs whose own home must stay on (Xiaomi / PatchWall, 2026-11-03): two Xiaomi TVs went black with a dead remote
+     * after their home was switched off (fine until the next power-on). There AK Home is only *chosen* as the home.
+     */
+    val keepStockHome: Boolean = false,
 ) {
     val name: String get() = listOf(brand, model).filter { it.isNotBlank() }.joinToString(" ").ifBlank { "Android TV" }
 }
@@ -37,7 +42,7 @@ class Home(val pkg: String, val label: String)
  * (RESTORE file), so "Back to original" works from any phone, even after the installer was reinstalled.
  * Nothing is ever deleted from the TV except AK Home itself, and only when asked.
  */
-class Tv(private val ctx: Context, private val adb: AdbClient, private val fix: (String) -> Unit = {}) {
+class Tv(private val ctx: Context, private val adb: TvShell, private val fix: (String) -> Unit = {}) {
     companion object {
         private const val TMP = "/data/local/tmp/akhome.apk"
         private const val RESTORE = "/data/local/tmp/akhome-restore.txt"
@@ -49,13 +54,17 @@ class Tv(private val ctx: Context, private val adb: AdbClient, private val fix: 
             "com.rockchips.android.leanbacklauncher" to "Box home (Rockchip)", "com.droidlogic.launcher.provider" to "Box home (Amlogic)",
             "com.amlogic.launcher" to "Box home (Amlogic)", "com.mbx.launcher" to "Box home", "com.android.launcher3" to "Android home",
             "com.android.launcher" to "Android home", "com.mstar.tv.tvlauncher" to "TV home (MStar)", "com.tcl.cyberui" to "TCL home",
-            "com.hisense.homepage" to "Hisense home", "com.xiaomi.mitv.tvlauncher" to "Mi TV home",
+            "com.hisense.homepage" to "Hisense home",
             "com.ak.home" to "AK Home 4 (old)",
         )
 
         /** TV makers: a TV set, not a box, when nothing better tells us. */
         private val TV_BRANDS = listOf("tcl", "hisense", "skyworth", "konka", "changhong", "sharp", "sony", "philips", "xiaomi",
             "haier", "panasonic", "toshiba", "vestel", "shinon", "lg", "samsung", "thomson", "jvc", "grundig", "nokia")
+
+        /** Makers whose own home the TV needs to start and to take the remote: never switched off (see keepStockHome). */
+        private val KEEP_HOME_MAKERS = listOf("xiaomi", "mitv", "redmi")
+        private fun vendorHome(pkg: String) = pkg.startsWith("com.mitv.") || pkg.startsWith("com.xiaomi.")
 
         /** Homes we never switch off: setup wizards and the Settings fallback home keep the TV usable. */
         private fun essential(pkg: String) = pkg in Edition.PACKAGES || pkg == "android" ||
@@ -83,7 +92,9 @@ class Tv(private val ctx: Context, private val adb: AdbClient, private val fix: 
         // sure = a real sign (CEC role, HDMI inputs, TV maker); "no HDMI inputs" alone is a guess → ask
         val kindSure = kindWhy != ctx.getString(R.string.why_no_hdmi)
         val userApps = adb.sh("pm list packages -3").lines().count { it.startsWith("package:") }
-        return TvInfo(sdk, brand, model, adb.prop("ro.build.version.release"), kind, kindWhy, userApps, kindSure)
+        val everything = adb.sh("pm list packages").lines().map { it.removePrefix("package:").trim() }
+        val keep = KEEP_HOME_MAKERS.any { maker.contains(it) } || everything.any(::vendorHome)
+        return TvInfo(sdk, brand, model, adb.prop("ro.build.version.release"), kind, kindWhy, userApps, kindSure, keep)
     }
 
     /** The edition that suits this TV. */
@@ -91,6 +102,7 @@ class Tv(private val ctx: Context, private val adb: AdbClient, private val fix: 
 
     /** Launchers that answer the Home key now, apart from AK Home and the essential ones: these get switched off. */
     fun stockHomes(info: TvInfo): List<Home> {
+        if (info.keepStockHome) return emptyList()
         val found = if (info.sdk >= 24) {
             adb.sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
                 .lines().map { it.trim() }.filter { Regex("^[\\w.]+/[\\w.$]+$").matches(it) }.map { it.substringBefore('/') }
@@ -101,7 +113,8 @@ class Tv(private val ctx: Context, private val adb: AdbClient, private val fix: 
         // Only real launchers: the ROM's own (system apps) or ones we know. Ordinary apps the user installed are never
         // touched even when they declare a HOME screen (Cinemana, Cinemana 4K and CEE do) — found on onn, 2026-10-29.
         val system = adb.sh("pm list packages -s").lines().map { it.removePrefix("package:").trim() }.toSet()
-        return found.distinct().filterNot(::essential).filter { it in KNOWN || it in system }.map { Home(it, label(it)) }
+        return found.distinct().filterNot(::essential).filterNot(::vendorHome)
+            .filter { it in KNOWN || it in system }.map { Home(it, label(it)) }
     }
 
     // ---------------------------------------------------------------- install (with the doctor)
@@ -145,6 +158,16 @@ class Tv(private val ctx: Context, private val adb: AdbClient, private val fix: 
 
     /** Switches the stock launchers off (remembering them on the TV) and makes AK Home the home, checking it took. */
     fun makeHome(info: TvInfo, e: Edition, homes: List<Home>) {
+        if (info.keepStockHome) {
+            // heal TVs set up by an older installer: their own home goes back on before the next power-on needs it
+            val off = switchedOff()
+            if (off.isNotEmpty()) { fix(ctx.getString(R.string.fix_keep_home)); for (p in off) adb.sh("pm enable $p"); adb.sh("rm -f $RESTORE") }
+            pickHome(info, e)
+            adb.sh("am start -a android.intent.action.MAIN -c android.intent.category.HOME")
+            // the TV's own home may still answer the Home key: that is the price of a TV that starts every time
+            if (!isHome(info, e)) fix(ctx.getString(R.string.problem_keep_home))
+            return
+        }
         val all = (switchedOff() + homes.map { it.pkg }).distinct()
         adb.sh("echo '${all.joinToString("\n")}' > $RESTORE")
         for (h in homes) adb.sh("pm disable-user --user 0 ${h.pkg}")

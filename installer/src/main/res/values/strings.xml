@@ -98,4 +98,6 @@
         <item quantity="other">Found %d screens — tap yours</item>
     </plurals>
     <string name="guide_6">Some boxes also have «Network debugging» or «ADB over network»: turn it on. Android 11 and newer: turn on «Wireless debugging». Then put the phone on the same Wi-Fi and tap «Install on my TV».</string>
+    <string name="fix_keep_home">Xiaomi TV: its own home is switched back on (the TV needs it to start)</string>
+    <string name="problem_keep_home">Xiaomi TV: AK Home is installed and opens from your apps. The Home key may still show Xiaomi’s home — switching that home off is what turned Xiaomi screens black, so we leave it on.</string>
 </resources>

@@ -122,79 +122,135 @@ object Slides {
     // ------------------------------------------------------------------ weather
 
     /**
-     * The sky as it is now in Baghdad: colour from the hour and the clouds, the sun or moon drawn, the
-     * temperature big, and the next hours along the bottom right, each with its own drawn symbol.
+     * The weather in the AK Agency app's look (user, 2026-11-04: "only that design language, nothing overlapping"):
+     * the night ground with the brand maroon glowing from the left, two frosted glass cards side by side —
+     * now (city, big degrees, the word in blush, high / low) and the next hours (hour, symbol, degrees).
+     * Every line is measured and shrunk to fit its own box, so nothing can run into anything. Drawn once per slide.
      */
     fun weather(item: HeroItem, w: Int, h: Int, radius: Float): Bitmap {
         val (out, c) = canvas(w, h, radius)
         val m = try { JSONObject(item.meta) } catch (_: Exception) { JSONObject() }
-        val code = m.optInt("code"); val day = m.optBoolean("day", true); val phase = m.optString("phase")
-        // our own colours, dark (user): brand maroon by day, near-black by night, an ember at dawn / dusk,
-        // a greyed maroon under clouds and rain — the weather shows in the symbols, the identity in the sky
-        val (top, bottom) = when {
-            code >= 51 -> 0xFF24141B.toInt() to 0xFF0B0609.toInt()
-            phase == "dawn" || phase == "dusk" -> 0xFF4A0626.toInt() to 0xFF3A1208.toInt()
-            !day -> 0xFF1C0412.toInt() to 0xFF050206.toInt()
-            code >= 3 -> 0xFF341420.toInt() to 0xFF0E070A.toInt()
-            else -> 0xFF56042C.toInt() to 0xFF12020A.toInt()
-        }
-        c.drawPaint(Paint().apply { shader = LinearGradient(0f, 0f, 0f, h.toFloat(), top, bottom, Shader.TileMode.CLAMP) })
-        if (!day && code < 3) {   // a few stars
-            val s = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x99FFFFFF.toInt() }
-            val rnd = java.util.Random(7)
-            repeat(40) { c.drawCircle(rnd.nextFloat() * w, rnd.nextFloat() * h * 0.6f, h * (0.003f + rnd.nextFloat() * 0.005f), s) }
-        }
-        // the big symbol, half behind the numbers
-        icon(c, code, day, w * 0.355f, h * 0.36f, h * 0.17f)
-        // darken the bottom for the hour row
-        c.drawRect(0f, h * 0.55f, w.toFloat(), h.toFloat(), Paint().apply {
-            shader = LinearGradient(0f, h * 0.55f, 0f, h.toFloat(), 0, 0x66000000, Shader.TileMode.CLAMP)
+        val code = m.optInt("code"); val day = m.optBoolean("day", true)
+        // ground: AK night + the maroon glow from the left (dimmer at night)
+        c.drawColor(AK_NIGHT)
+        c.drawPaint(Paint().apply {
+            shader = RadialGradient(0f, h * 0.35f, w * 0.75f, if (day) 0x8C9A1450.toInt() else 0x5C56042C, 0, Shader.TileMode.CLAMP)
         })
+        val pad = h * 0.09f; val gap = h * 0.06f; val r = h * 0.08f
+        val now = RectF(pad, pad, w * 0.46f, h - pad)
+        val next = RectF(now.right + gap, pad, w - pad, h - pad)
+        glass(c, now, r); glass(c, next, r)
 
-        val x0 = w * 0.06f
-        c.drawText(m.optString("city"), x0, h * 0.2f, text(1, h * 0.08f, 0xDDFFFFFF.toInt(), Paint.Align.LEFT))
-        val deg = m.optString("t") + "°"
-        c.drawText(deg, x0 - h * 0.02f, h * 0.62f, text(0, h * 0.42f, Color.WHITE, Paint.Align.LEFT))
-        c.drawText(m.optString("word"), x0, h * 0.78f, text(1, h * 0.075f, Color.WHITE, Paint.Align.LEFT))
-        c.drawText("↑ ${m.optString("hi")}°    ↓ ${m.optString("lo")}°", x0, h * 0.9f, text(1, h * 0.065f, 0xCCFFFFFF.toInt(), Paint.Align.LEFT))
+        // now: four bands, top to bottom — city / degrees + symbol / word / high-low. The symbol owns a square
+        // beside the degrees and is clipped to it, so it can never sit behind a line and no line behind it.
+        val hp = now.height(); val ip = hp * 0.11f
+        val inner = now.width() - ip * 2
+        line(c, m.optString("city"), now.left + ip, now.top + hp * 0.2f, inner, 0, hp * 0.085f, AK_MUTED)
+        val sq = hp * 0.36f                                                     // band 0.27 … 0.63
+        val box = RectF(now.right - ip - sq, now.top + hp * 0.27f, now.right - ip, now.top + hp * 0.27f + sq)
+        icon(c, code, day, box)
+        deg(c, m.optString("t"), now.left + ip, now.top + hp * 0.6f, box.left - hp * 0.05f - (now.left + ip), 1, hp * 0.4f, Color.WHITE, false)
+        line(c, m.optString("word"), now.left + ip, now.top + hp * 0.76f, inner, 1, hp * 0.085f, AK_BLUSH)
+        // high / low on one line: shrunk together if they would not fit
+        val hl = text(0, hp * 0.072f, AK_SECOND, Paint.Align.LEFT)
+        val hi = "↑ " + m.optString("hi"); val lo = "↓ " + m.optString("lo")
+        val need = degWidth(hl, hi) + hl.textSize * 1.4f + degWidth(hl, lo)
+        if (need > inner) hl.textSize *= inner / need
+        val hx = deg(c, hi, now.left + ip, now.top + hp * 0.9f, inner, 0, hl.textSize, AK_SECOND, false)
+        deg(c, lo, hx + hl.textSize * 1.4f, now.top + hp * 0.9f, inner, 0, hl.textSize, AK_SECOND, false)
 
-        // next hours: a glass strip on the right
+        // next hours: equal columns, nothing shared between them
         val hours = m.optJSONArray("hours")
         if (hours != null && hours.length() > 0) {
-            val left = w * 0.47f; val right = w * 0.96f; val y0 = h * 0.2f; val y1 = h * 0.86f
-            c.drawRoundRect(RectF(left, y0, right, y1), h * 0.07f, h * 0.07f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x1FFFFFFF })
-            c.drawRoundRect(RectF(left, y0, right, y1), h * 0.07f, h * 0.07f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = 0x33FFFFFF; style = Paint.Style.STROKE; strokeWidth = h * 0.006f
-            })
-            val n = hours.length(); val col = (right - left) / n
+            val n = hours.length(); val col = next.width() / n; val cp = col * 0.1f; val hn = next.height()
             for (i in 0 until n) {
-                val o = hours.getJSONObject(i); val cx = left + col * (i + 0.5f)
-                c.drawText(o.optString("h"), cx, y0 + h * 0.13f, text(1, h * 0.055f, 0xCCFFFFFF.toInt()))
-                icon(c, o.optInt("c"), o.optBoolean("d", true), cx, (y0 + y1) / 2, h * 0.075f)
-                c.drawText(o.optString("t") + "°", cx, y1 - h * 0.07f, text(2, h * 0.075f))
+                val o = hours.getJSONObject(i); val cx = next.left + col * (i + 0.5f)
+                // bands: hour 0.12…0.26 / symbol 0.34…0.66 / degrees 0.73…0.86
+                center(c, o.optString("h"), cx, next.top + hn * 0.24f, col - cp * 2, 0, hn * 0.08f, AK_MUTED)
+                val s = minOf(hn * 0.32f, col - cp * 2)
+                icon(c, o.optInt("c"), o.optBoolean("d", true), RectF(cx - s / 2, next.top + hn * 0.5f - s / 2, cx + s / 2, next.top + hn * 0.5f + s / 2))
+                deg(c, o.optString("t"), cx, next.top + hn * 0.84f, col - cp * 2, 1, hn * 0.11f, Color.WHITE, true)
             }
         }
         return out.also { it.prepareToDraw() }
+    }
+
+    // AK Agency app colours (constants/theme.ts)
+    private const val AK_NIGHT = 0xFF080106.toInt()
+    private const val AK_BLUSH = 0xFFF6C4D0.toInt()
+    private const val AK_SECOND = 0xBDFFFFFF.toInt()   // textSecondary, white 74 %
+    private const val AK_MUTED = 0x99FFFFFF.toInt()    // textMuted, white 60 %
+
+    /** The app's Glass card: see-through card fill, maroon glow from the top-left corner, light sheen → shade. */
+    private fun glass(c: Canvas, b: RectF, r: Float) {
+        val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        p.color = 0x611C0E16; c.drawRoundRect(b, r, r, p)                       // rgba(28,14,22,0.38)
+        p.color = 0; p.shader = RadialGradient(b.left, b.top, b.height() * 1.4f, 0x4D9A1450, 0, Shader.TileMode.CLAMP)
+        c.drawRoundRect(b, r, r, p)                                             // rgba(154,20,80,0.30)
+        p.shader = LinearGradient(0f, b.top, 0f, b.bottom, intArrayOf(0x17FFFFFF, 0x05FFFFFF, 0x2E000000), floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP)
+        c.drawRoundRect(b, r, r, p)
+    }
+
+    /** One line, left-aligned at [x], shrunk until it fits [max] wide (never cut, never over the next box). */
+    private fun line(c: Canvas, s: String, x: Float, y: Float, max: Float, tf: Int, size: Float, color: Int) {
+        if (s.isBlank() || max <= 0f) return
+        val p = text(tf, size, color, Paint.Align.LEFT); fit(p, s, max); c.drawText(s, x, y, p)
+    }
+
+    private fun center(c: Canvas, s: String, x: Float, y: Float, max: Float, tf: Int, size: Float, color: Int) {
+        if (s.isBlank() || max <= 0f) return
+        val p = text(tf, size, color); fit(p, s, max); c.drawText(s, x, y, p)
+    }
+
+    /**
+     * Degrees: the number, then the ° as its own small ring a clear gap after it (in Readex Pro the ° glyph sits on
+     * the last digit). Left-aligned at [x], or centred on it; shrunk to [max]. Returns the right edge.
+     */
+    private fun deg(c: Canvas, num: String, x: Float, y: Float, max: Float, tf: Int, size: Float, color: Int, centred: Boolean): Float {
+        if (num.isBlank()) return x
+        val p = text(tf, size, color, Paint.Align.LEFT)
+        val total = degWidth(p, num); if (total > max && max > 0f) p.textSize *= max / total
+        val nw = p.measureText(num); val all = degWidth(p, num); val sz = p.textSize
+        val x0 = if (centred) x - all / 2 else x
+        c.drawText(num, x0, y, p)
+        val ringR = sz * 0.085f
+        c.drawCircle(x0 + nw + sz * 0.07f + ringR, y - sz * 0.70f + ringR, ringR, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = color; style = Paint.Style.STROKE; strokeWidth = sz * 0.045f
+        })
+        return x0 + all
+    }
+
+    /** Width of a number, the gap and its ring. */
+    private fun degWidth(p: Paint, num: String) = p.measureText(num) + p.textSize * (0.07f + 0.17f + 0.03f)
+
+    private fun fit(p: Paint, s: String, max: Float) {
+        val wd = p.measureText(s); if (wd > max) p.textSize *= max / wd
+    }
+
+    /** A symbol inside its own square: sized so every symbol fits (sun rays reach 1.7 r) and clipped to it. */
+    private fun icon(c: Canvas, code: Int, day: Boolean, box: RectF) {
+        val r = minOf(box.width(), box.height()) / 2f / 1.8f
+        c.save(); c.clipRect(box)
+        icon(c, code, day, box.centerX(), box.centerY(), r)
+        c.restore()
     }
 
     /** Drawn weather symbols (no emoji font needed): sun, moon, cloud, rain, snow, storm, fog. */
     private fun icon(c: Canvas, code: Int, day: Boolean, cx: Float, cy: Float, r: Float) {
         val p = Paint(Paint.ANTI_ALIAS_FLAG)
         fun sun(x: Float, y: Float, s: Float) {
-            p.shader = RadialGradient(x, y, s * 2.2f, 0x66FFD25A, 0, Shader.TileMode.CLAMP); c.drawCircle(x, y, s * 2.2f, p); p.shader = null
-            p.color = 0xFFFFC93C.toInt(); p.strokeWidth = s * 0.16f; p.strokeCap = Paint.Cap.ROUND
+            p.color = AK_BLUSH; p.strokeWidth = s * 0.16f; p.strokeCap = Paint.Cap.ROUND
             for (k in 0 until 8) {
                 val a = Math.PI * k / 4
                 c.drawLine(x + (s * 1.3f * Math.cos(a)).toFloat(), y + (s * 1.3f * Math.sin(a)).toFloat(),
                     x + (s * 1.7f * Math.cos(a)).toFloat(), y + (s * 1.7f * Math.sin(a)).toFloat(), p)
             }
-            p.color = 0xFFFFD86B.toInt(); c.drawCircle(x, y, s, p)
+            p.color = AK_BLUSH; c.drawCircle(x, y, s, p)
         }
         fun moon(x: Float, y: Float, s: Float) {
-            p.shader = RadialGradient(x, y, s * 2f, 0x40DDE6FF, 0, Shader.TileMode.CLAMP); c.drawCircle(x, y, s * 2f, p); p.shader = null
             val path = Path().apply { addCircle(x, y, s, Path.Direction.CW) }
             path.op(Path().apply { addCircle(x + s * 0.55f, y - s * 0.35f, s * 0.85f, Path.Direction.CW) }, Path.Op.DIFFERENCE)
-            p.color = 0xFFEEF2FF.toInt(); c.drawPath(path, p)
+            p.color = AK_BLUSH; c.drawPath(path, p)
         }
         fun cloud(x: Float, y: Float, s: Float, color: Int) {
             p.color = color
@@ -213,18 +269,18 @@ object Slides {
             }
             else -> {
                 val dark = code >= 51
-                cloud(cx, cy - r * 0.15f, r * 0.85f, if (dark) 0xFFC9D2DE.toInt() else 0xF2FFFFFF.toInt())
+                cloud(cx, cy - r * 0.15f, r * 0.85f, if (dark) 0xBDFFFFFF.toInt() else 0xF2FFFFFF.toInt())
                 p.strokeCap = Paint.Cap.ROUND; p.strokeWidth = r * 0.12f
                 when {
                     code in 95..99 -> {
-                        p.color = 0xFFFFD23C.toInt(); p.style = Paint.Style.FILL
+                        p.color = AK_BLUSH; p.style = Paint.Style.FILL
                         c.drawPath(Path().apply {
                             moveTo(cx + r * 0.1f, cy + r * 0.45f); lineTo(cx - r * 0.25f, cy + r * 0.95f); lineTo(cx + r * 0.05f, cy + r * 0.95f)
                             lineTo(cx - r * 0.15f, cy + r * 1.4f); lineTo(cx + r * 0.35f, cy + r * 0.8f); lineTo(cx + r * 0.05f, cy + r * 0.8f); close()
                         }, p)
                     }
                     code in 71..77 || code == 85 || code == 86 -> { p.color = Color.WHITE; for (k in -1..1) c.drawCircle(cx + k * r * 0.45f, cy + r * 0.85f + (k and 1) * r * 0.2f, r * 0.1f, p) }
-                    code >= 51 -> { p.color = 0xFF7EC8FF.toInt(); for (k in -1..1) c.drawLine(cx + k * r * 0.45f, cy + r * 0.7f, cx + k * r * 0.45f - r * 0.15f, cy + r * 1.1f, p) }
+                    code >= 51 -> { p.color = AK_BLUSH; for (k in -1..1) c.drawLine(cx + k * r * 0.45f, cy + r * 0.7f, cx + k * r * 0.45f - r * 0.15f, cy + r * 1.1f, p) }
                 }
             }
         }

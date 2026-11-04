@@ -342,7 +342,7 @@ class MainActivity : Activity() {
             } catch (e: AdbPairingRequiredException) {
                 ui { showPair(f) }
             } catch (e: Exception) {
-                android.util.Log.w("AKI", "connect failed", e)
+                android.util.Log.w("AKI", "connect failed: " + generateSequence(e as Throwable) { it.cause }.joinToString(" <- ") { "${it.javaClass.name}: ${it.message}" }, e)
                 ui { showError(explain(e)) }
             }
         }

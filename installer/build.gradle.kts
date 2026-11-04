@@ -15,8 +15,8 @@ android {
         applicationId = "com.akhome.installer"
         minSdk = 24          // phones; TLS pairing (Android 11+ TVs) works through the bundled Conscrypt
         targetSdk = 35
-        versionCode = 19      // raise on every build sent to a phone, or it may refuse the "update"
-        versionName = "1.2"   // carries AK Home 1.2; 19 = Xiaomi: never switch its home off, 17 = new TV icon + name "AK Home", 16 = launcher look, 15 = site look
+        versionCode = 20      // raise on every build sent to a phone, or it may refuse the "update"
+        versionName = "1.2.1" // carries AK Home 1.2; 20 = restore never leaves a TV without a home, 19 = Xiaomi: never switch its home off, 17 = new TV icon + name "AK Home", 16 = launcher look, 15 = site look
         // phones only: no x86 parts (emulators / PCs) — saves 4.6 MB
         // (`-PallAbis` keeps x86 for emulator tests)
         ndk { abiFilters += if (project.hasProperty("allAbis")) listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64") else listOf("arm64-v8a", "armeabi-v7a") }

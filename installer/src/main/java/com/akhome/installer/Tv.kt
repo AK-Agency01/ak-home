@@ -224,14 +224,37 @@ class Tv(private val ctx: Context, private val adb: TvShell, private val fix: (S
             .replace("AK Home 4 (old)", "AK Home 4 (القديم)")
     }
 
-    /** Back to the TV's own home screen: stock launchers on again, AK Home removed (if asked). */
-    fun restore(info: TvInfo, removeAkHome: Boolean) {
-        val off = switchedOff()
+    /**
+     * Everything "Back to original" turns on again: what the RESTORE file lists + any known stock launcher that is
+     * switched off now (also one switched off by something else before the installer — with an empty file, restore
+     * used to turn nothing on, remove AK Home and leave the TV on the black fallback home with a dead remote).
+     */
+    fun toRestore(): List<String> {
+        val disabled = adb.sh("pm list packages -d").lines().map { it.removePrefix("package:").trim() }
+        return (switchedOff() + disabled.filter { (it in KNOWN && it != "com.ak.home") || vendorHome(it) }).distinct()
+    }
+
+    /** A home screen other than AK Home that the TV can open now (the Settings fallback home does not count). */
+    private fun otherHome(info: TvInfo): Boolean = if (info.sdk >= 24)
+        adb.sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
+            .lines().map { it.trim() }.filter { Regex("^[\\w.]+/[\\w.$]+$").matches(it) }.map { it.substringBefore('/') }
+            .any { !essential(it) }
+    else adb.sh("pm list packages -e").lines().map { it.removePrefix("package:").trim() }
+        .any { it in KNOWN && it != "com.ak.home" }
+
+    /**
+     * Back to the TV's own home screen: stock launchers on again, AK Home removed (if asked) — but never when no other
+     * home is left, or the TV would sit on a black screen. Returns false when AK Home had to stay for that reason.
+     */
+    fun restore(info: TvInfo, removeAkHome: Boolean): Boolean {
+        val off = toRestore()
         for (p in off) adb.sh("pm enable $p")
         if (info.sdk >= 29 && off.isNotEmpty()) adb.sh("cmd role add-role-holder android.app.role.HOME ${off.first()} 0")
-        if (removeAkHome) for (p in Edition.PACKAGES) adb.sh("pm uninstall $p")
+        val safe = otherHome(info)
+        if (removeAkHome && safe) for (p in Edition.PACKAGES) adb.sh("pm uninstall $p")
         adb.sh("rm -f $RESTORE")
         adb.sh("input keyevent 3")
+        return !removeAkHome || safe
     }
 
     private fun freeKb(path: String): Long =

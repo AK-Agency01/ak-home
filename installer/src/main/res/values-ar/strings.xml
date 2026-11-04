@@ -47,6 +47,8 @@
     <string name="remove_too">احذف AK Home هم</string>
     <string name="restore_btn">رجّع</string>
     <string name="restored">رجعت واجهة الشاشة الأصلية ✓</string>
+    <string name="restore_kept_title">خلّينا AK Home على الشاشة</string>
+    <string name="restore_kept">ما لگينا واجهة ثانية تشتغل على هاي الشاشة، ولو نحذف AK Home تبقى الشاشة سودة وما يشتغل الريموت. فخلّيناه.</string>
 
     <string name="guide_title">فعّل وضع المطوّر (مرة وحدة بس)</string>
     <string name="guide_1">بالشاشة افتح الإعدادات ⚙️، واختار «تفضيلات الأجهزة».</string>

@@ -49,6 +49,8 @@
     <string name="remove_too">Also remove AK Home</string>
     <string name="restore_btn">Restore</string>
     <string name="restored">The TV\'s own home screen is back ✓</string>
+    <string name="restore_kept_title">AK Home stays on this TV</string>
+    <string name="restore_kept">No other home screen works on this TV. Without AK Home it would sit on a black screen with a dead remote, so we kept it.</string>
 
     <string name="guide_title">Turn on debugging (once)</string>
     <string name="guide_1">On the TV open Settings ⚙️, then choose «Device Preferences».</string>

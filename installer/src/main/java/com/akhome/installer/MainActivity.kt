@@ -304,7 +304,10 @@ class MainActivity : Activity() {
                 val rm = remove.isChecked
                 showBusy(getString(R.string.restore_btn) + "…")
                 io.execute {
-                    try { tv.restore(info, rm); ui { done(getString(R.string.restored), null) } }
+                    try {
+                        val ok = tv.restore(info, rm)
+                        ui { if (ok) done(getString(R.string.restored), null) else done(getString(R.string.restore_kept_title), getString(R.string.restore_kept)) }
+                    }
                     catch (e: Exception) { ui { showError(explain(e)) } }
                 }
             },
@@ -338,7 +341,7 @@ class MainActivity : Activity() {
                     val homes = tv.stockHomes(info)
                     ui { showPlan(tv, info, homes) }
                 }
-                else { val off = tv.switchedOff().map { tv.label(it) }; ui { showRestore(tv, info, off) } }
+                else { val off = tv.toRestore().map { tv.label(it) }; ui { showRestore(tv, info, off) } }
             } catch (e: AdbPairingRequiredException) {
                 ui { showPair(f) }
             } catch (e: Exception) {

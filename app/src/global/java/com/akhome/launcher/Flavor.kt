@@ -5,7 +5,11 @@ object Flavor {
     /** The big card: trending films and series, shown only (not tied to any app — apps differ per box). */
     val feed: HeroFeed? = TrendingFeed()
 
-    val extras = emptyList<Extra>()
+    /** Mixed into the card between the titles, each on its own clock (user, 2026-11-06). */
+    val extras = listOf(
+        Extra("sky3", WeatherFeed(), 30 * 60_000L, often = true),
+        Extra("big-matches5", MatchFeed(), 30 * 60_000L, often = true),
+    )
 
     val favourites = listOf("com.netflix.ninja", "com.google.android.youtube.tv", "com.amazon.amazonvideo.livingroom")
 

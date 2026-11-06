@@ -51,7 +51,8 @@ object AdbKeys {
 interface TvShell {
     /** Runs a command on the TV and returns everything it printed (stdout + stderr), trimmed. */
     fun sh(cmd: String): String
-    fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit)
+    /** Copies a file to the TV; [plain] = the older stream copy instead of ADB's own file service. */
+    fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit, plain: Boolean = false)
     fun prop(name: String): String = sh("getprop $name")
 }
 
@@ -84,11 +85,50 @@ class AdbClient : AbsAdbConnectionManager(), TvShell {
 
     private companion object { const val END = "__AKHOME_END__" }
 
+    override fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit, plain: Boolean) =
+        if (plain) pushPlain(src, size, path, progress) else pushSync(src, size, path, progress)
+
     /**
-     * Copies a file to the TV byte for byte. `exec:` (Android 5+) has no terminal in between, so binary data
-     * arrives intact, unlike `shell:` on old TVs.
+     * ADB's own file service, the one `adb push` uses: the TV confirms when the whole file is on its disk, or says why
+     * not. Replies come back on the same stream; a watchdog closes it so a silent TV cannot hold the install forever.
      */
-    override fun push(src: InputStream, size: Long, path: String, progress: (Int) -> Unit) {
+    private fun pushSync(src: InputStream, size: Long, path: String, progress: (Int) -> Unit) = openStream("sync:").use { s ->
+        val out = s.openOutputStream(); val reply = s.openInputStream()
+        val buf = ByteArray(8 + 64 * 1024)   // 64 KB = the most one DATA block may carry
+        fun head(id: String, n: Int) { java.nio.ByteBuffer.wrap(buf).order(java.nio.ByteOrder.LITTLE_ENDIAN).put(id.toByteArray()).putInt(n) }
+        val spec = "$path,33188".toByteArray()   // 33188 = regular file, 0644
+        head("SEND", spec.size); out.write(buf, 0, 8); out.write(spec)
+        var sent = 0L; var last = -1
+        while (true) {
+            val n = src.read(buf, 8, buf.size - 8); if (n < 0) break
+            head("DATA", n); out.write(buf, 0, 8 + n); sent += n
+            val pct = if (size > 0) (sent * 100 / size).toInt() else 0
+            if (pct != last) { progress(pct); last = pct }
+        }
+        head("DONE", (System.currentTimeMillis() / 1000).toInt()); out.write(buf, 0, 8); out.flush()
+        val watchdog = java.util.Timer(true).apply { schedule(object : java.util.TimerTask() { override fun run() { s.close() } }, 60_000) }
+        try {
+            val answer = ByteArray(8); readFully(reply, answer)
+            val id = String(answer, 0, 4, Charsets.US_ASCII)
+            if (id != "OKAY") {
+                val why = ByteArray(java.nio.ByteBuffer.wrap(answer).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt(4).coerceIn(0, 512))
+                if (id == "FAIL") readFully(reply, why)
+                throw java.io.IOException("TV: $id ${String(why)}")
+            }
+        } finally { watchdog.cancel() }
+        head("QUIT", 0); out.write(buf, 0, 8)
+    }
+
+    private fun readFully(input: InputStream, into: ByteArray) {
+        var at = 0
+        while (at < into.size) { val n = input.read(into, at, into.size - at); if (n < 0) throw java.io.IOException("TV closed the copy"); at += n }
+    }
+
+    /**
+     * The older copy. `exec:` (Android 5+) has no terminal in between, so binary data arrives intact, unlike `shell:`
+     * on old TVs.
+     */
+    private fun pushPlain(src: InputStream, size: Long, path: String, progress: (Int) -> Unit) {
         openStream("exec:cat > $path").use { s ->
             val out = s.openOutputStream()
             val buf = ByteArray(64 * 1024)

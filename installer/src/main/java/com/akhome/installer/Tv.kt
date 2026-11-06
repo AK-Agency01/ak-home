@@ -42,6 +42,9 @@ class Home(val pkg: String, val label: String)
  * (RESTORE file), so "Back to original" works from any phone, even after the installer was reinstalled.
  * Nothing is ever deleted from the TV except AK Home itself, and only when asked.
  */
+/** The copy to the TV failed both ways; the message is what the TV reported. An IOException, so a reconnect is tried first. */
+class CopyFailed(msg: String) : java.io.IOException(msg)
+
 class Tv(private val ctx: Context, private val adb: TvShell, private val fix: (String) -> Unit = {}) {
     companion object {
         private const val TMP = "/data/local/tmp/akhome.apk"
@@ -119,6 +122,22 @@ class Tv(private val ctx: Context, private val adb: TvShell, private val fix: (S
 
     // ---------------------------------------------------------------- install (with the doctor)
 
+    /** Copies an asset to the TV: ADB's file service first, then the plain stream; if both fail, says what the TV reported. */
+    private fun send(asset: String, size: Long, path: String, progress: (Int) -> Unit) {
+        var why = ""
+        for (plain in listOf(false, true)) {
+            try { ctx.assets.open(asset).use { adb.push(it, size, path, progress, plain) }; return }
+            catch (x: Exception) {
+                android.util.Log.w("AKI", "copy failed, plain=$plain", x)
+                why = "${x.javaClass.simpleName}: ${x.message}".take(160)
+                if (!plain) fix(ctx.getString(R.string.fix_copy, why))
+            }
+        }
+        val tv = try { adb.sh("id -u; getenforce; ls -ld /data/local/tmp; df /data/local/tmp | tail -1; ls -l $path; getprop ro.product.model; getprop ro.build.version.sdk").replace("\n", " | ") }
+                 catch (_: Exception) { "no shell" }
+        throw CopyFailed("$why\n$tv")
+    }
+
     /** Streams the edition APK from the installer's assets to the TV and installs it, fixing what it can. */
     fun install(e: Edition, progress: (Int) -> Unit) {
         val size = ctx.assets.openFd(e.asset).use { it.length }
@@ -129,8 +148,7 @@ class Tv(private val ctx: Context, private val adb: TvShell, private val fix: (S
         }
         var out = ""
         for (attempt in 1..3) {
-            try { ctx.assets.open(e.asset).use { adb.push(it, size, TMP, progress) } }
-            catch (x: Exception) { if (attempt == 3) throw x; fix(ctx.getString(R.string.fix_resend)); continue }
+            send(e.asset, size, TMP, progress)
             out = adb.sh("pm install -r $TMP")
             if (out.contains("Success")) break
             when {

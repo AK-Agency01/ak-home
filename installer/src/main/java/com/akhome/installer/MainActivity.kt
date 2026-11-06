@@ -228,7 +228,7 @@ class MainActivity : Activity() {
     private fun showError(msg: String) {
         page(start = false,
             title("⚠"),
-            text(msg, 16f, Color.WHITE, light).apply { pad(bottom = 24) },
+            text(msg, 16f, Color.WHITE, light).apply { pad(bottom = 24); setTextIsSelectable(true) },
             button(getString(R.string.again), primary = true) { showStart() },
         )
     }
@@ -366,6 +366,7 @@ class MainActivity : Activity() {
         val all = generateSequence(e) { it.cause }.joinToString(" | ") { "${it.javaClass.simpleName} ${it.message}" }
         return when {
             e is Problem -> e.message ?: ""
+            e is CopyFailed -> getString(R.string.problem_copy, e.message)
             all.contains("ECONNREFUSED") || all.contains("refused", true) -> getString(R.string.problem_refused_conn)
             all.contains("Authentication", true) || all.contains("Unauthori", true) -> getString(R.string.problem_auth)
             all.contains("timed out", true) || all.contains("Timeout", true) -> getString(R.string.problem_timeout)
@@ -414,7 +415,7 @@ class MainActivity : Activity() {
             // doctor: a dropped Wi-Fi connection is reconnected once and the step repeated
             fun <T> step(block: () -> T): T = try { block() } catch (x: java.io.IOException) {
                 val f = last ?: throw x
-                doctor(getString(R.string.fix_reconnect)); tv = Tv(this, open(f), doctor); block()
+                doctor(getString(R.string.fix_reconnect) + " (${x.javaClass.simpleName})"); tv = Tv(this, open(f), doctor); block()
             }
             try {
                 val iHome = steps.indexOf(R.string.step_home); val iCheck = steps.indexOf(R.string.step_check)

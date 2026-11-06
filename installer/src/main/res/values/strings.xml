@@ -69,12 +69,14 @@
     <string name="plan_nothing_else">Nothing else on the TV is deleted or changed.</string>
     <string name="fix_space">Doctor: not enough space on the TV — cleared caches</string>
     <string name="fix_resend">Doctor: the copy was damaged — sent it again</string>
+    <string name="fix_copy">Doctor: the copy did not finish (%1$s) — trying another way</string>
     <string name="fix_replace">Doctor: an older AK Home signed differently was on the TV — replaced it</string>
     <string name="fix_downgrade">Doctor: a newer AK Home was on the TV — installed this one over it</string>
     <string name="fix_other_home">Doctor: another home screen was still active (%1$s) — switched it off too</string>
     <string name="fix_start">Doctor: AK Home did not start — started it again</string>
     <string name="fix_reconnect">Doctor: the connection dropped — connected again</string>
     <string name="problem_restricted">The TV blocks installs from a computer. In Developer options turn on “Install via USB” (Xiaomi: also “USB debugging (Security settings)”), then try again.</string>
+    <string name="problem_copy">Could not copy AK Home to the TV. Please send us a photo of this message:\n\n%1$s</string>
     <string name="problem_refused">The TV refused the install: %1$s</string>
     <string name="problem_not_home">The Home button still opens the old home screen. Press Home on the remote and choose AK Home with “Always”.</string>
     <string name="problem_crash">AK Home does not start on this TV. Send us the TV model: %1$s</string>

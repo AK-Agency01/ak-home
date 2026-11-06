@@ -67,12 +67,14 @@
     <string name="plan_nothing_else">ولا شي ثاني بالشاشة ينحذف أو يتغير.</string>
     <string name="fix_space">الطبيب: المساحة ما تكفي بالشاشة — نظّفت الكاش</string>
     <string name="fix_resend">الطبيب: الملف وصل خربان — دزّيته مرة ثانية</string>
+    <string name="fix_copy">الطبيب: النسخ للشاشة ما كمل (%1$s) — أجرب طريقة ثانية</string>
     <string name="fix_replace">الطبيب: جان أكو AK Home قديم بتوقيع ثاني — بدّلته</string>
     <string name="fix_downgrade">الطبيب: جان أكو AK Home أحدث — نصّبت هذا فوكه</string>
     <string name="fix_other_home">الطبيب: بعد أكو واجهة ثانية شغالة (%1$s) — طفّيتها هم</string>
     <string name="fix_start">الطبيب: AK Home ما اشتغل — شغّلته مرة ثانية</string>
     <string name="fix_reconnect">الطبيب: انقطع الاتصال — رجعت اتصلت</string>
     <string name="problem_restricted">الشاشة تمنع التنصيب من الكمبيوتر. بخيارات المطوّر شغّل «التثبيت عبر USB» (شاومي: هم «تصحيح USB (إعدادات الأمان)»)، وبعدين جرّب مرة ثانية.</string>
+    <string name="problem_copy">ما كدرنا ننسخ AK Home للشاشة. صوّر هاي الرسالة ودزها إلنا:\n\n%1$s</string>
     <string name="problem_refused">الشاشة رفضت التنصيب: %1$s</string>
     <string name="problem_not_home">زر Home بعده يفتح الواجهة القديمة. اضغط Home بالريموت واختار AK Home ويّه «دائماً».</string>
     <string name="problem_crash">AK Home ما يشتغل على هاي الشاشة. دزّلنا موديل الشاشة: %1$s</string>

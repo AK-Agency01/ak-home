@@ -51,6 +51,7 @@ class MainActivity : Activity() {
     private lateinit var ui: Ui
     private lateinit var prefs: Prefs
     private var lite = false
+    @Volatile private var lastKey = 0L
     private val main = Handler(Looper.getMainLooper())
 
     private lateinit var root: FrameLayout
@@ -734,12 +735,17 @@ class MainActivity : Activity() {
             if (dist > 1) { it.image = null; it.logo = null }
         }
         if (item.image != null) showHeroItem(item)
-        else Thread { loadHero(item); main.post { if (heroItems.getOrNull(heroPos) === item) showHeroItem(item) } }.start()
+        else behind { loadHero(item); main.post { if (heroItems.getOrNull(heroPos) === item) showHeroItem(item) } }
         // keep the next picture ready so the switch never waits on the network
         heroItems.getOrNull((heroPos + d + heroItems.size) % heroItems.size)?.takeIf { it.image == null }?.let { n ->
-            Thread { loadHero(n) }.start()
+            behind { loadHero(n) }
         }
     }
+
+    /** Picture work never competes with the strip: on weak TVs a slide composed during a key press cost 10 ms a frame. */
+    private fun behind(work: () -> Unit) = Thread {
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND); work()
+    }.start()
 
     /** Slides are composed at exactly the card size, so nothing is scaled when drawn. */
     private fun loadHero(item: HeroItem) {
@@ -833,7 +839,8 @@ class MainActivity : Activity() {
                     }
                     Thread.sleep(500)   // 2 wake-ups a second is plenty for an 8–12 s slide timer
                     if (!hero.hasFocus()) wait++
-                    if (wait >= (if (lite) 24 else 16)) { wait = 0; main.post { heroStep(1) } }
+                    // the card waits while the remote is in use: a new slide under the keys is the one jank left on weak TVs
+                    if (wait >= (if (lite) 24 else 16) && SystemClock.uptimeMillis() - lastKey > 3000) { wait = 0; main.post { heroStep(1) } }
                 }
             } catch (_: InterruptedException) { }
         }.apply { isDaemon = true; priority = Thread.MIN_PRIORITY; start() }
@@ -1325,6 +1332,11 @@ class MainActivity : Activity() {
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() { /* home screen: nothing behind it */ }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        lastKey = SystemClock.uptimeMillis()
+        return super.dispatchKeyEvent(event)
+    }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
